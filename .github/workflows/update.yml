@@ -1,0 +1,40 @@
+name: update
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      - run: pacman -Syu --noconfirm git jq pacman-contrib
+
+      - uses: actions/checkout@v4
+
+      - id: check
+        run: |
+          latest=$(curl -fsSL -H "Authorization: Bearer ${{ github.token }}" \
+            https://api.github.com/repos/kbterm/kubeterm/releases/latest | jq -r .tag_name)
+          latest=${latest#v}
+          current=$(sed -n 's/^pkgver=//p' PKGBUILD)
+          echo "tag=$latest" >> "$GITHUB_OUTPUT"
+          [ -n "$latest" ] && [ "$latest" != null ] && [ "$latest" != "$current" ] && echo "new=true" >> "$GITHUB_OUTPUT" || true
+
+      - if: steps.check.outputs.new == 'true'
+        run: |
+          sed -i "s/^pkgver=.*/pkgver=${{ steps.check.outputs.tag }}/; s/^pkgrel=.*/pkgrel=1/" PKGBUILD
+          useradd -m builder
+          chown -R builder .
+          su builder -c "updpkgsums && makepkg --printsrcinfo > .SRCINFO"
+          git config --global --add safe.directory "$PWD"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PKGBUILD .SRCINFO
+          git commit -m "kubeterm-bin $(sed -n 's/^\s*pkgver = //p' .SRCINFO)-1"
+          git push
