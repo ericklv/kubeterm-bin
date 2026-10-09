@@ -1,6 +1,6 @@
 pkgbase = kubeterm-bin
 	pkgdesc = Kubernetes monitoring and management desktop client
-	pkgver = 2.8.1
+	pkgver = 2.8.2
 	pkgrel = 1
 	url = https://github.com/kbterm/kubeterm
 	arch = x86_64
@@ -13,7 +13,7 @@ pkgbase = kubeterm-bin
 	conflicts = kubeterm
 	options = !strip
 	options = !debug
-	source = https://github.com/kbterm/kubeterm/releases/download/v2.8.1/kubeterm-2.8.1-x86_64.deb
-	sha256sums = c5422a610fad5725ffebac17497c3b5201dac4d131f81cb77eac057371003af4
+	source = https://github.com/kbterm/kubeterm/releases/download/v2.8.2/kubeterm-2.8.2-x86_64.deb
+	sha256sums = b11c84c7e4b9bc8f2bebff7282fe81ef1b893475f0ef3e679f2c76a9759fe87d
 
 pkgname = kubeterm-bin
